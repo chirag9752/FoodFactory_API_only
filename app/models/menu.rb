@@ -1,4 +1,4 @@
 class Menu < ApplicationRecord
-    has_many :order_items, dependent: :destroy
-    belongs_to :hotel
+  has_many :order_items, dependent: :destroy
+  belongs_to :hotel
 end

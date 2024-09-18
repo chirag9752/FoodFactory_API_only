@@ -1,0 +1,42 @@
+class UsersController < ApplicationController        
+  before_action :authenticate_user!, except: [:index]  # Require authentication except for registration
+  before_action :set_user, only: [:update]  # Require authentication except for registration
+  load_and_authorize_resource
+  
+  def index
+  # Fetch all users (You can add filtering or pagination as needed)
+    @users = User.all
+
+    users_data = @users.map do |user|
+      {
+        name: user.name,
+        role: user.role
+      }
+    end
+
+    render json:  users_data , status: :ok
+  end
+        
+  def show
+    render json: { user: current_user }, status: :ok
+  end
+      
+  def update
+    # byebug
+    if @user.update(user_params)
+      render json: {message: 'user updated successfully', user: @user}, status: :ok
+    else
+      render json: {errors: @user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  def user_params
+    params.require(:user).permit(:name, :email, :password, :role)
+  end
+end

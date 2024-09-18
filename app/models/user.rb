@@ -1,15 +1,16 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-    devise :database_authenticatable, :registerable,
+  include Devise::JWT::RevocationStrategies::JTIMatcher
+  
+  devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :jwt_authenticatable, jwt_revocation_strategy: JwtBlacklist
-    has_many :hotels
-    has_many :orders
+         :jwt_authenticatable, jwt_revocation_strategy: self
 
-    enum role: {
-        admin: 0,
-        client: 1,
-        HotelOwner: 2
+  has_many :hotels
+  has_many :orders
+
+  enum role: {
+      admin: 0,
+      client: 1,
+      hotel_owner: 2
     }
 end
