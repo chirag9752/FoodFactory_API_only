@@ -1,25 +1,13 @@
 class MenusController < ApplicationController
 
-  before_action :authenticate_user!, except: [:index]
+  before_action :authenticate_user!
   before_action :set_menu, only: [:show, :update, :destroy]
   before_action :set_hotel, only: [:create, :index]
   load_and_authorize_resource
-            
-  def index
-    # @menus = @hotel.menus.all
   
-    @menus = @hotel.menus.all
-
-      @mapped_menus = @menus.map do |menu|
-      {
-        menu_id: menu.id,
-        name: menu.menu_name,
-        hotel_id: menu.hotel_id,
-        details: menu.description,
-        price: menu.price
-      }
-    end
-      render json: @mapped_menus, status: :ok
+  def index
+    menus = @hotel.menus.all
+    render json: create_object_index(menus), status: :ok
   end
         
   def show
@@ -56,6 +44,19 @@ class MenusController < ApplicationController
 
   def set_menu
     @menu = Menu.find(params[:id])
+  end
+
+  def create_object_index(menus)
+    @mapped_menus = menus.map do |menu|
+      {
+        menu_id: menu.id,
+        name: menu.menu_name,
+        hotel_id: menu.hotel_id,
+        details: menu.description,
+        price: menu.price
+      }
+    end
+    @mapped_menus
   end
 
   def set_hotel

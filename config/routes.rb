@@ -9,7 +9,6 @@ Rails.application.routes.draw do
       registrations: 'users/registrations'  
     }
 
-
   resources :users do 
     resources :hotels do
       resources :menus
@@ -17,11 +16,6 @@ Rails.application.routes.draw do
         resources :order_items, only: [:index, :show]
       end
     end
-      
-    end
-    
-    
-
+  end
   get "up" => "rails/health#show", as: :rails_health_check
-
 end
