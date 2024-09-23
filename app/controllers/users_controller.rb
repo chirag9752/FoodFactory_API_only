@@ -30,6 +30,7 @@ class UsersController < ApplicationController
   def all_users_data(users)
     users_data = users.map do |user|
       {
+        id: user.id,
         name: user.name,
         role: user.role
       }

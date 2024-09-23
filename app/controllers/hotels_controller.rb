@@ -53,6 +53,7 @@ class HotelsController < ApplicationController
     end
     @mapped_hotels = @hotels.map do |hotel|
       {
+        id: hotel.id,
         name: hotel.Hotel_name,
         user_id: hotel.user_id
       }
@@ -60,9 +61,9 @@ class HotelsController < ApplicationController
      @mapped_hotels
   end
 
-  def set_user
-    user = User.find(params[:user_id])
-  end
+  # def set_user
+  #   user = User.find(params[:user_id])
+  # end
 
   def hotel_params
     params.require(:hotel).permit(:Hotel_name)

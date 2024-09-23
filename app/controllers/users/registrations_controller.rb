@@ -1,23 +1,59 @@
 # frozen_string_literal: true
 class Users::RegistrationsController < Devise::RegistrationsController
-
   include RackSessionsFix
   respond_to :json
 
+  before_action :validate_role, only: [:create]
   private
 
   def respond_with(current_user, _opts = {})
-    if resource.persisted?             # it check weather uses exit 
-      render json: {
-        status: {code: 200, message: 'Signed up successfully.'},
-        data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
-      }
+    if resource.persisted?             
+      if current_user.errors[:role].include?("cannot be assigned as admin")
+        render json: {
+          status: { message: "Admin role cannot be assigned through registration." }
+        }, status: :forbidden
+      else
+        render json: {
+          status: { code: 200, message: 'Signed up successfully.' },
+          data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+        }
+      end
     else
-      render json: {
-        status: {message: "User couldn't be created successfully. #{current_user.errors.full_messages.to_sentence}"}
-      }, status: :unprocessable_entity
+      #handle invalid roles 
+      if current_user.errors[:role].any?
+        render json: {
+          status: { message: "User couldn't be created: #{current_user.errors.full_messages.to_sentence}" }
+        }, status: :unprocessable_entity
+      else
+        render json: {
+          status: { message: "User couldn't be created successfully. #{current_user.errors.full_messages.to_sentence}" }
+        }, status: :unprocessable_entity
+      end
     end
   end
+    
+
+  def validate_role
+  role = params[:user][:role]
+  role = role.to_s # Convert to string to match with enum keys
+
+  unless User.roles.key?(role)
+    render json: {
+      status: { message: "Invalid role: #{role}" }
+    }, status: :unprocessable_entity
+    return
+  end
+
+  if role == 'admin'
+    render json: {
+      status: { message: "Admin role cannot be assigned through registration." }
+    }, status: :forbidden
+    return
+  end
+end
+
+
+  
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
 
