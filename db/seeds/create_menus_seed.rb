@@ -1,3 +1,4 @@
+module Seeds
 class CreateMenusSeed
     def self.seed_menus
     puts "Seeding Menus..."
@@ -15,4 +16,5 @@ class CreateMenusSeed
   
     puts "Created #{Menu.count} menus"
   end
+end
 end
