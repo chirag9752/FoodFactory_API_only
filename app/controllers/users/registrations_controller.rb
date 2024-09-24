@@ -4,6 +4,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
   before_action :validate_role, only: [:create]
+  
   private
 
   def respond_with(current_user, _opts = {})

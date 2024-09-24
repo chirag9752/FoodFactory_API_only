@@ -5,6 +5,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
 
+  validates :name, :role, :email, :password, presence: true
+
   has_many :hotels, dependent: :destroy
   has_many :orders, dependent: :destroy
 
@@ -13,15 +15,4 @@ class User < ApplicationRecord
       client: 1,
       hotel_owner: 2
     }
-
-  # validates :role, inclusion: { in: roles.keys, message: "%{value} is not a valid role" }
-  # before_validation :restrict_admin_role, on: :create
-  
-  # private
-  
-  # def restrict_admin_role
-  #   if role == "admin"
-  #     errors.add(:role, "cannot be assigned as a admin")
-  #   end
-  # end
 end

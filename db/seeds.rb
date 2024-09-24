@@ -1,91 +1,157 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-
-
-
 User.destroy_all
 Hotel.destroy_all
 Menu.destroy_all
 Order.destroy_all
-OrderItem.destroy_all
 
-admin = User.create!(
-  name: 'Farad Agrawal',
-  email: 'farad@gmail.com',
-  password: '123456',
-  password_confirmation: '123456',
-  role: "admin"
-)
+class Seeds
+  def call_for_create
+    CreateUsersSeed.seed_users
+    CreateHotelsSeed.seed_hotels
+    CreateMenusSeed.seed_menus
+    create_orders_seed = CreateOrdersSeed.new
+    create_orders_seed.create_orders
+  end  
+end
 
-
-hotel_owner1 = User.create!(
-    name: 'paragji',
-    email: 'paragji@gmail.com',
-    password: '123456',
-    password_confirmation: '123456',
-    role: "hotel_owner"
-)
-
-client1 = User.create!(
-    name: 'sunita',
-    email: 'sunita@gmail.com',
-    password: '123456',
-    password_confirmation: '123456',
-    role: "client"
-)
-
-client2 = User.create!(
-    name: 'client2',
-    email: 'client2@gmail.com',
-    password: '123456',
-    password_confirmation: '123456',
-    role: "client"
-)
-
-hotel1 = Hotel.create!(
-  Hotel_name: 'Hotel Sunshine',
-  user: hotel_owner1
-)
+seed_object = Seeds.new
+seed_object.call_for_create
 
 
-menu1 = Menu.create!(
-  menu_name: 'Breakfast Special',
-  description: 'A special breakfast menu with pancakes and coffee',
-  price: 150,
-  hotel: hotel1
-)
 
-menu2 = Menu.create!(
-  menu_name: 'Lunch Delight',
-  description: 'A delightful lunch menu with sandwiches and salads',
-  price: 200,
-  hotel: hotel1
-)
 
-order1 = Order.create!(
-  user: client1,
-  hotel: hotel1,
-  total_price: 500,
-  status: 'pending'
-)
 
-OrderItem.create!(
-  order: order1,
-  menu: menu1,
-  quantity: 2,
-  price: menu1.price
-)
 
-OrderItem.create!(
-  order: order1,
-  menu: menu2,
-  quantity: 1,
-  price: menu2.price
-)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def create_users
+  #   puts "seeding users"
+  
+  #   admin = User.create!(
+  #     name: "Admin",
+  #     email: "admin@example.com",
+  #     password: "password",
+  #     password_confirmation: "password",
+  #     role: :admin
+  #   )
+  
+  #   hotel_owner = User.create!(
+  #     name: "Hotel owner",
+  #     email: "hotelowner@example.com",
+  #     password: "password",
+  #     password_confirmation: "password",
+  #     role: :hotel_owner
+  #   )
+  
+  #   10.times do |i|
+  #     User.create!(
+  #       name: Faker::Name.name,
+  #       email: Faker::Internet.email,
+  #       password: "password",
+  #       password_confirmation: "password",
+  #       role: :client
+  #     )
+  #   end
+  
+  #   puts "Created #{User.count} users"
+  # end
+  
+  # def create_hotels
+  #   puts "seeding Hotels"
+  
+  #   User.hotel_owner.each do |owner|
+  #     3.times do 
+  #       Hotel.create!(
+  #         Hotel_name: Faker::Restaurant.name,
+  #         user: owner
+  #       )
+  #     end
+  #   end
+  
+  #   puts "Created #{Hotel.count} hotels"
+  # end
+  
+  # def create_menus
+  #   puts "Seeding Menus..."
+  
+  #   Hotel.all.each do |hotel|
+  #     5.times do
+  #       Menu.create!(
+  #         menu_name: Faker::Food.dish,
+  #         description: Faker::Food.description,
+  #         price: rand(100..300),
+  #         hotel: hotel
+  #       )
+  #     end
+  #   end
+  
+  #   puts "Created #{Menu.count} menus"
+  # end
+  
+  # def create_orders
+  #   puts "Seeding orders"
+  
+  #   clients = User.client
+  #   hotels = Hotel.all
+  
+  #   clients.each do |client|
+  #     3.times do
+  #       order = Order.create!(
+  #         user: client,
+  #         hotel: hotels.sample,    # .sample is a Ruby method that selects a random element from an array.
+  #         total_price: 0
+  #       )
+  
+  #       create_order_items(order)
+  #     end
+  #   end
+  
+  #   puts "Created #{Order.count} orders."
+  # end
+  
+  # def create_order_items(order)
+  #   puts "Seeding order Items for Order #{order.id}"
+  
+  #   menu_items = order.hotel.menus.sample(3)
+  #   total_price = 0
+  
+  #   menu_items.each do |menu|
+  #     quantity = rand(1..3)
+  #     OrderItem.create!(
+  #       order: order,
+  #       menu: menu,
+  #       quantity: quantity,
+  #       price: menu.price * quantity
+  #     )
+  #     total_price += menu.price * quantity
+  #   end
+  
+  #   order.update!(total_price: total_price)
+  
+  #   puts "Created #{OrderItem.where(order: order).count} orders for Order #{order.id}"
+  # end

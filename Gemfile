@@ -11,6 +11,8 @@ gem 'jsonapi-serializer'
 gem 'cancancan', '~> 3.0'
 gem 'rubocop', require: false
 
+gem 'faker'
+
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 1.4"
 

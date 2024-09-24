@@ -1,8 +1,8 @@
 class HotelsController < ApplicationController
-  
+
   before_action :authenticate_user!
-  before_action :set_hotel, only: [:show , :update, :destroy]
-  before_action :set_user, only: [:index]
+  before_action :set_hotel, only: [:show, :update, :destroy]
+  before_action :set_user, only: [:create]
   load_and_authorize_resource
 
   def index
@@ -14,7 +14,7 @@ class HotelsController < ApplicationController
   end
 
   def create
-    @hotel = current_user.hotels.build(hotel_params) 
+    @hotel = @user.hotels.build(hotel_params) 
     if @hotel.save
       render json: @hotel, status: :created
     else
@@ -41,6 +41,10 @@ class HotelsController < ApplicationController
 
   private
 
+  def set_user 
+    @user = User.find(params[:user_id])
+  end
+
   def set_hotel
     @hotel = Hotel.find(params[:id])
   end
@@ -60,10 +64,6 @@ class HotelsController < ApplicationController
     end
      @mapped_hotels
   end
-
-  # def set_user
-  #   user = User.find(params[:user_id])
-  # end
 
   def hotel_params
     params.require(:hotel).permit(:Hotel_name)

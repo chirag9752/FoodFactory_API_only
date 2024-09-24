@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-
+  
   before_action :authenticate_user!
   before_action :set_order, only: [:show, :destroy]
   load_and_authorize_resource
@@ -53,7 +53,6 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    # params.require(:order).permit(:total_price, :status, OrderItem: [:menu_id, :quantity, :price])
     params.require(:order).permit(:total_price, :status)
   end
 	
