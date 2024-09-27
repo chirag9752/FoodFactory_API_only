@@ -6,8 +6,10 @@ Rails.application.routes.draw do
     registration: 'signup'
   }, controllers: {
       sessions: 'users/sessions',
-      registrations: 'users/registrations'  
+      registrations: 'users/registrations'
     }
+
+    # resources :payments, except: [:update]
 
   resources :users do 
     resources :hotels do

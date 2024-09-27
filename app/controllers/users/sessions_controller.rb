@@ -9,7 +9,7 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find_by(email: email)
     if user && user.valid_password?(password)
       sign_in(user)
-      UserMailer.welcome_email(user).deliver_now
+      UserMailerJob.perform_later(user)
       render json: {
       status: {
       code: 200,

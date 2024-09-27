@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
-  
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
@@ -20,7 +20,7 @@ class User < ApplicationRecord
   private
 
   def send_welcome_email
-    UserMailer.welcome_email(self).deliver_now
+    UserMailerJob.perform_later(self)
     Rails.logger.info("User welcome email sent to: #{email}")
   end
 end

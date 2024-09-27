@@ -10,7 +10,7 @@ class MenusController < ApplicationController
     render json: create_object_index(menus), status: :ok
   end
 
-  def show
+  def show+
     render json: @menu
   end
   

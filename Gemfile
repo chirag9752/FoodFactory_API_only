@@ -12,6 +12,16 @@ gem 'cancancan', '~> 3.0'
 gem 'rubocop', require: false
 
 gem 'faker'
+gem 'stripe'
+gem 'sidekiq'
+
+
+# for testing we are using rspec
+group :development, :test do
+  gem 'rspec-rails', '~> 7.0.0'
+end
+
+
 
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 1.4"
