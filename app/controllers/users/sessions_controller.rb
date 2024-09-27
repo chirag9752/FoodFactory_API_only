@@ -1,60 +1,31 @@
 class Users::SessionsController < Devise::SessionsController
-  include RackSessionsFix
-    respond_to :json
-
-    # def create
-    #   # If Authorization header is present, check if the user is already logged in
-    #   if response.headers['Authorization'].present?
-    #     current_token = request.headers['Authorization'].split(' ').last
-    #     jwt_payload = JWT.decode(current_token, Rails.application.credentials.devise_jwt_secret_key!).first
-    #     current_user_id = jwt_payload['sub']
   
-    #     if current_user_id == current_user.id
-    #       render json: {
-    #         status: {
-    #           code: 200, message: "You are already logged in.",
-    #           data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-    #         }
-    #       }, status: :ok
-    #     else
-    #       # Proceed with the login for another user if the token doesn't match
-    #       super
-    #     end
-    #   else
-    #     # If no Authorization token is present, proceed with login
-    #     super
-    #   end
-    # end
+  include RackSessionsFix
+  respond_to :json
 
-      def create
-        # Extract email and password from the request
-        email = params[:user][:email]
-        password = params[:user][:password]
-    
-        # Find the user by email
-        user = User.find_by(email: email)
-    
-        if user && user.valid_password?(password)
-          # If the user exists and the password is correct, sign in the user
-          sign_in(user)
-    
-          render json: {
-            status: {
-              code: 200,
-              message: 'Logged in successfully.',
-              data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes] }
-            }
-          }, status: :ok
-        else
-          # If the credentials are incorrect, respond with an error
-          render json: {
-            status: {
-              code: 401,
-              message: 'Invalid email or password.'
-            }
-          }, status: :unauthorized
-        end
-      end
+  def create
+    email = params[:user][:email]
+    password = params[:user][:password]
+    user = User.find_by(email: email)
+    if user && user.valid_password?(password)
+      sign_in(user)
+      UserMailer.welcome_email(user).deliver_now
+      render json: {
+      status: {
+      code: 200,
+      message: 'Logged in successfully.',
+      data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes] }
+      }
+    }, status: :ok
+    else
+      render json: {
+      status: {
+      code: 401,
+      message: 'Invalid email or password.'
+      }
+    }, status: :unauthorized
+    end
+  end
 
   private
 
@@ -77,7 +48,7 @@ class Users::SessionsController < Devise::SessionsController
     if current_user
       render json: {
         status: 200,
-        message: 'Logged out successfully.'
+        message: "Logged out successfully. MR. #{current_user.name}"
       }, status: :ok
     else
       render json: {
@@ -87,3 +58,81 @@ class Users::SessionsController < Devise::SessionsController
     end
   end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # def create
+  #   # If Authorization header is present, check if the user is already logged in
+  #   if response.headers['Authorization'].present?
+  #   current_token = request.headers['Authorization'].split(' ').last
+  #   jwt_payload = JWT.decode(current_token, Rails.application.credentials.devise_jwt_secret_key!).first
+  #   current_user_id = jwt_payload['sub']
+  
+  #   if current_user_id == current_user.id
+  #     render json: {
+  #   status: {
+  #     code: 200, message: "You are already logged in.",
+  #     data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
+  #   }
+  #     }, status: :ok
+  #   else
+  #     # Proceed with the login for another user if the token doesn't match
+  #     super
+  #   end
+  #   else
+  #   # If no Authorization token is present, proceed with login
+  #   super
+  #   end
+  # end

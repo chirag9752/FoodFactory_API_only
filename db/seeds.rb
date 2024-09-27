@@ -1,7 +1,7 @@
-User.destroy_all
-Hotel.destroy_all
-Menu.destroy_all
-Order.destroy_all
+# User.destroy_all
+# Hotel.destroy_all
+# Menu.destroy_all
+# Order.destroy_all
 
 Dir[File.join(Rails.root, 'db', 'seeds', '*.rb')].sort.each do |seed|
   load seed

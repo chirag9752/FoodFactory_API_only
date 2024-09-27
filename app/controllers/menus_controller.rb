@@ -9,11 +9,11 @@ class MenusController < ApplicationController
     menus = @hotel.menus.all
     render json: create_object_index(menus), status: :ok
   end
-        
+
   def show
     render json: @menu
   end
-        
+  
   def create
     @menu = @hotel.menus.build(menu_params)
     if @menu.save
@@ -22,7 +22,7 @@ class MenusController < ApplicationController
       render json: @menu.errors, status: :unprocessable_entity
     end
   end
-        
+  
   def update
     if @menu.update(menu_params)
       render json: @menu , status: :created
@@ -30,7 +30,7 @@ class MenusController < ApplicationController
       render json: @menu.errors , status: :unprocessable_entity
     end
   end
-        
+  
   def destroy
     menu_name = @menu.menu_name
     if @menu.destroy 
@@ -39,9 +39,9 @@ class MenusController < ApplicationController
       render json: @menu.errors, status: :unprocessable_entity
     end
   end
-        
+  
   private
-
+  
   def set_menu
     @menu = Menu.find(params[:id])
   end

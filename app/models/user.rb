@@ -6,6 +6,7 @@ class User < ApplicationRecord
          :jwt_authenticatable, jwt_revocation_strategy: self
 
   validates :name, :role, :email, :password, presence: true
+  after_create :send_welcome_email
 
   has_many :hotels, dependent: :destroy
   has_many :orders, dependent: :destroy
@@ -15,4 +16,11 @@ class User < ApplicationRecord
       client: 1,
       hotel_owner: 2
     }
+  
+  private
+
+  def send_welcome_email
+    UserMailer.welcome_email(self).deliver_now
+    Rails.logger.info("User welcome email sent to: #{email}")
+  end
 end
