@@ -9,12 +9,13 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find_by(email: email)
     if user && user.valid_password?(password)
       sign_in(user)
+      token = JwtTokenService.encode(user_id: user.id)
       UserMailerJob.perform_later(user)
       render json: {
       status: {
       code: 200,
       message: 'Logged in successfully.',
-      data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes] }
+      data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes].merge(jwt: token) }
       }
     }, status: :ok
     else
@@ -39,24 +40,66 @@ class Users::SessionsController < Devise::SessionsController
   end
 
 
+  # def respond_to_on_destroy
+  #   if request.headers['Authorization'].present?
+  #     jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, Rails.application.credentials.devise_jwt_secret_key!).first
+  #     current_user = User.find(jwt_payload['sub'])
+  #   end
+    
+  #   if current_user
+  #     # current_user.update(jti: nil)
+  #     render json: {
+  #       status: 200,
+  #       message: "Logged out successfully. MR. #{current_user.name}"
+  #     }, status: :ok
+  #   else
+  #     render json: {
+  #       status: 401,
+  #       message: "Couldn't find an active session."
+  #     }, status: :unauthorized
+  #   end
+  # end
   def respond_to_on_destroy
     if request.headers['Authorization'].present?
-      jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, Rails.application.credentials.devise_jwt_secret_key!).first
-      current_user = User.find(jwt_payload['sub'])
-    end
-    
-    if current_user
-      render json: {
-        status: 200,
-        message: "Logged out successfully. MR. #{current_user.name}"
-      }, status: :ok
+      begin
+        token = request.headers['Authorization'].split(' ').last
+        jwt_payload = JWT.decode(token, Rails.application.credentials.devise_jwt_secret_key!).first
+        current_user = User.find_by(id: jwt_payload['sub'])
+  
+        if current_user
+          # Optionally, invalidate token by resetting jti or adding it to a blocklist
+          # current_user.update(jti: SecureRandom.uuid) # example for invalidation
+  
+          sign_out(current_user)
+          render json: {
+            status: 200,
+            message: "Logged out successfully. MR. #{current_user.name}"
+          }, status: :ok
+        else
+          render json: {
+            status: 401,
+            message: "Couldn't find the user associated with this token."
+          }, status: :unauthorized
+        end
+      rescue JWT::DecodeError => e
+        render json: {
+          status: 401,
+          message: "Invalid token. Error: #{e.message}"
+        }, status: :unauthorized
+      rescue ActiveRecord::RecordNotFound
+        render json: {
+          status: 401,
+          message: "User not found."
+        }, status: :unauthorized
+      end
     else
       render json: {
         status: 401,
-        message: "Couldn't find an active session."
+        message: "Authorization header is missing."
       }, status: :unauthorized
     end
   end
+  
 end
 
 

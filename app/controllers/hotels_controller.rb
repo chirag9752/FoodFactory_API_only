@@ -2,11 +2,11 @@ class HotelsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_hotel, only: [:show, :update, :destroy]
-  before_action :set_user, only: [:create]
+  before_action :set_user, only: [:create , :index]
   load_and_authorize_resource
 
   def index
-    render json: indexObjectMaker(current_user)
+    render json: indexObjectMaker(@user)
   end
 
   def show
@@ -41,12 +41,24 @@ class HotelsController < ApplicationController
 
   private
 
-  def set_user 
-    @user = User.find(params[:user_id])
+  def set_user
+    if params[:user_id].present?
+      @user = User.find(params[:user_id])
+    else
+      render json: { error: 'User ID not provided' }, status: :bad_request
+    end
+  rescue ActiveRecord::RecordNotFound  #f the user ID is provided but doesn't exist in the database
+    render json: { error: 'User not found' }, status: :not_found
   end
 
   def set_hotel
-    @hotel = Hotel.find(params[:id])
+    if params[:id].present?
+      @hotel = Hotel.find(params[:id])
+    else
+      render json: {error: 'Hotel Id not provided'}
+    end
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Hotel not found'}, status: :not_found
   end
 
   def indexObjectMaker(user)

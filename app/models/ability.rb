@@ -13,13 +13,13 @@ class Ability
       can :manage, Menu
       can :manage, Hotel, user_id: user.id
       can :read, Order
-      can :read, User
+      can :manage, User
     when 'client'
       can :manage, Order
       can :read, Hotel
       can :read, Menu
       can :read, OrderItem
-      can :read, User
+      can :manage, User
     else
       # Handle cases where the user role is not recognized
       can :read, :all # or restrict access as needed

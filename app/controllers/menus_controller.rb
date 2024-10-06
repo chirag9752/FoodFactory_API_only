@@ -4,13 +4,13 @@ class MenusController < ApplicationController
   before_action :set_menu, only: [:show, :update, :destroy]
   before_action :set_hotel, only: [:create, :index]
   load_and_authorize_resource
-  
+
   def index
     menus = @hotel.menus.all
     render json: create_object_index(menus), status: :ok
   end
 
-  def show+
+  def show
     render json: @menu
   end
   
@@ -43,7 +43,13 @@ class MenusController < ApplicationController
   private
   
   def set_menu
-    @menu = Menu.find(params[:id])
+    if params[:id].present?
+      @menu = Menu.find(params[:id])
+    else
+      render json: {error: 'Menu Id not provided'}, status: :bad_request
+    end
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Menu not found' }, status: :not_found
   end
 
   def create_object_index(menus)
@@ -60,7 +66,13 @@ class MenusController < ApplicationController
   end
 
   def set_hotel
-    @hotel = Hotel.find(params[:hotel_id])
+    if params[:hotel_id].present?
+      @hotel = Hotel.find(params[:hotel_id])
+    else
+      render json: {error: 'Hotel Id not provided'}
+    end
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Hotel not found'}, status: :not_found
   end
 
   def menu_params

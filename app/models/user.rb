@@ -16,7 +16,7 @@ class User < ApplicationRecord
       client: 1,
       hotel_owner: 2
     }
-  
+
   private
 
   def send_welcome_email

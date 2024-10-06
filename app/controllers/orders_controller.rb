@@ -2,6 +2,7 @@ class OrdersController < ApplicationController
   
   before_action :authenticate_user!
   before_action :set_order, only: [:show, :destroy]
+  before_action :set_user, only: [:destroy]
   load_and_authorize_resource
 
   def index
@@ -24,7 +25,7 @@ class OrdersController < ApplicationController
   end
  
   def destroy
-    if @order.user == current_user
+    if @order.user.id == @user.id
       @order.destroy
       render json: { message: "Order successfully deleted"}, status: :ok
     else
@@ -34,9 +35,24 @@ class OrdersController < ApplicationController
 
   private
 
-  def set_order
-    @order = Order.find(params[:id])
+  def set_user  
+    if params[:user_id].present?
+      @user = User.find(params[:user_id])
+    else
+      render json: { error: 'User ID not provided' }, status: :bad_request
+    end
+  rescue ActiveRecord::RecordNotFound  #f the user ID is provided but doesn't exist in the database
+    render json: { error: 'User not found' }, status: :not_found
   end
+  
+  def set_order
+    @order = Order.find_by(id: params[:id])
+    
+    unless @order
+      render json: { error: "Order not found with id: #{params[:id]}" }, status: :not_found
+    end
+  end
+  
 
   def createOrderService
     service = CreateOrderService.new(current_user, @hotel, order_params, params[:order_items])

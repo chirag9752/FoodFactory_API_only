@@ -19,6 +19,8 @@ gem 'sidekiq'
 # for testing we are using rspec
 group :development, :test do
   gem 'rspec-rails', '~> 7.0.0'
+  gem 'factory_bot_rails'
+  gem 'shoulda-matchers'
 end
 
 

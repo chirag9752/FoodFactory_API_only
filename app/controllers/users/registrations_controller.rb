@@ -8,7 +8,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def respond_with(current_user, _opts = {})
-    if resource.persisted?             
+    if resource.persisted?
       if current_user.errors[:role].include?("cannot be assigned as admin")
         render json: {
           status: { message: "Admin role cannot be assigned through registration." }
