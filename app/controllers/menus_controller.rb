@@ -3,11 +3,16 @@ class MenusController < ApplicationController
   before_action :authenticate_user!
   before_action :set_menu, only: [:show, :update, :destroy]
   before_action :set_hotel, only: [:create, :index]
+  before_action :set_user, only: [:index]
   load_and_authorize_resource
 
   def index
-    menus = @hotel.menus.all
-    render json: create_object_index(menus), status: :ok
+    if @user.role == "hotel_owner"
+      menus = @hotel.menus.all
+    else
+      menus = Menu.all
+    end
+      render json: create_object_index(menus), status: :ok
   end
 
   def show
@@ -25,7 +30,7 @@ class MenusController < ApplicationController
   
   def update
     if @menu.update(menu_params)
-      render json: @menu , status: :created
+      render json: @menu , status: :ok
     else
       render json: @menu.errors , status: :unprocessable_entity
     end
@@ -41,6 +46,16 @@ class MenusController < ApplicationController
   end
   
   private
+
+  def set_user  
+    if params[:user_id].present?
+      @user = User.find(params[:user_id])
+    else
+      render json: { error: 'User ID not provided' }, status: :bad_request
+    end
+  rescue ActiveRecord::RecordNotFound  #f the user ID is provided but doesn't exist in the database
+    render json: { error: 'User not found' }, status: :not_found
+  end
   
   def set_menu
     if params[:id].present?

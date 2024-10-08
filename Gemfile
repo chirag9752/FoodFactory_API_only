@@ -14,13 +14,14 @@ gem 'rubocop', require: false
 gem 'faker'
 gem 'stripe'
 gem 'sidekiq'
-
+gem 'whenever', require: false
 
 # for testing we are using rspec
 group :development, :test do
   gem 'rspec-rails', '~> 7.0.0'
   gem 'factory_bot_rails'
   gem 'shoulda-matchers'
+  gem 'rails-controller-testing'
 end
 
 

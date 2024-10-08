@@ -59,46 +59,32 @@ class Users::SessionsController < Devise::SessionsController
   #     }, status: :unauthorized
   #   end
   # end
+  
   def respond_to_on_destroy
     if request.headers['Authorization'].present?
-      begin
-        token = request.headers['Authorization'].split(' ').last
-        jwt_payload = JWT.decode(token, Rails.application.credentials.devise_jwt_secret_key!).first
-        current_user = User.find_by(id: jwt_payload['sub'])
-  
-        if current_user
-          # Optionally, invalidate token by resetting jti or adding it to a blocklist
-          # current_user.update(jti: SecureRandom.uuid) # example for invalidation
-  
-          sign_out(current_user)
-          render json: {
-            status: 200,
-            message: "Logged out successfully. MR. #{current_user.name}"
-          }, status: :ok
-        else
-          render json: {
-            status: 401,
-            message: "Couldn't find the user associated with this token."
-          }, status: :unauthorized
-        end
-      rescue JWT::DecodeError => e
+      token = request.headers['Authorization'].split(' ').last
+      decoded_token = JwtTokenService.decode(token)
+      
+      if decoded_token
+        JwtBlacklist.create!(jti: decoded_token[:jti], exp: Time.at(decoded_token[:exp]))
+        render json: {
+          status: 200,
+          message: "Logged out successfully"
+        }, status: :ok
+      else
         render json: {
           status: 401,
-          message: "Invalid token. Error: #{e.message}"
-        }, status: :unauthorized
-      rescue ActiveRecord::RecordNotFound
-        render json: {
-          status: 401,
-          message: "User not found."
+          message: "Invalid token or user already logged out."
         }, status: :unauthorized
       end
     else
       render json: {
         status: 401,
-        message: "Authorization header is missing."
+        message: "Couldn't find an active session."
       }, status: :unauthorized
     end
   end
+  
   
 end
 
