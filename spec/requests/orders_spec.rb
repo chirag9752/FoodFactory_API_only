@@ -128,7 +128,7 @@ RSpec.describe 'Users API', type: :request do
     end
 
     context 'with invalid parameters' do
-      let(:invalid_order_params) { { total_price: nil, status: 'pending' } }
+      let(:invalid_order_params) { { total_price: nil, status: nil } }
 
       it 'returns unprocessable entity with errors' do
         post "/users/#{user.id}/hotels/#{hotel.id}/orders", params: { order: invalid_order_params, order_items: orderItem }, headers: valid_headers
