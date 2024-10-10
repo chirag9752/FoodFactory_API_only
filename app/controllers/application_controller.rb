@@ -11,15 +11,6 @@ class ApplicationController < ActionController::API
 
   private
 
-  # def authenticate_user!
-  #   byebug
-  #   token = request.headers['Authorization']&.split(' ')&.last # Extract token from Authorization header
-  #   decoded_token = JwtTokenService.decode(token) # Decode the token using your JwtTokenService
-
-  #   if decoded_token.nil?
-  #     render json: { error: 'Not Authorized' }, status: :unauthorized
-  #   end
-  # end
   def authenticate_user!
     token = request.headers['Authorization']&.split(' ')&.last
     

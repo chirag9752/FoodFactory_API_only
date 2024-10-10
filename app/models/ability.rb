@@ -13,6 +13,7 @@ class Ability
       can :manage, Menu
       can :manage, Hotel, user_id: user.id
       can :read, Order
+      can :read, OrderItem
       can :manage, User
     when 'client'
       can :manage, Order
