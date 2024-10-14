@@ -24,7 +24,8 @@ class OrdersController < ApplicationController
   def create
     result = create_order_service.call
     if result[:status] == :created
-      render json: { order: objectForOrder(result) }, status: :created
+      render json: { checkout_url: result[:session].url }, status: :created
+      # render json: { order: objectForOrder(result) }, status: :created
     else
       render json: { errors: result[:errors] }, status: :unprocessable_entity
     end
@@ -75,14 +76,14 @@ class OrdersController < ApplicationController
                           order_items_params.map(&:to_h).map(&:deep_symbolize_keys))
   end
 
-  def objectForOrder(result)
-    {
-      order_id: result[:order].id,
-      status: result[:order].status,
-      total_price: result[:order].total_price,
-      order_items: result[:order_items]
-    }
-  end
+  # def objectForOrder(result)
+  #   {
+  #     order_id: result[:order].id,
+  #     status: result[:order].status,
+  #     total_price: result[:order].total_price,
+  #     order_items: result[:order_items]
+  #   }
+  # end
 
     # def order_params
     #   params.require(:order).permit(:total_price, :status)

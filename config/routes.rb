@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  root "hotels#index"
+
   devise_for :users, path: '', path_names: {
     sign_in: 'login',
     sign_out: 'logout',
@@ -9,7 +11,10 @@ Rails.application.routes.draw do
       registrations: 'users/registrations'
     }
 
-    # resources :payments, except: [:update]
+  post 'checkout/create_session', to: 'checkout#create_session'
+  # config/routes.rb
+  post 'webhooks/stripe', to: 'webhooks#stripe'
+
 
   resources :users do 
     resources :hotels do

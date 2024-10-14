@@ -14,6 +14,7 @@ gem 'rubocop', require: false
 gem 'faker'
 gem 'stripe'
 gem 'sidekiq'
+gem 'pry', '~> 0.14.2'
 gem 'whenever', require: false
 
 # for testing we are using rspec
@@ -22,6 +23,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'shoulda-matchers'
   gem 'rails-controller-testing'
+  gem "dotenv-rails"
 end
 
 

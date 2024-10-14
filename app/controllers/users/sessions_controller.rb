@@ -4,6 +4,7 @@ class Users::SessionsController < Devise::SessionsController
   respond_to :json
 
   def create
+    # binding.pry
     email = params[:user][:email]
     password = params[:user][:password]
     user = User.find_by(email: email)

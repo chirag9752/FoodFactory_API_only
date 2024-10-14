@@ -37,8 +37,8 @@ Rails.application.configure do
     address: 'smtp.gmail.com',
     port: 587,
     domain: 'gmail.com',
-    user_name: 'chiragagrawal112233@gmail.com',
-    password:  'hmee ciow hrwt naya',
+    user_name: ENV["EMAIL_USERNAME"],
+    password:  ENV["EMAIL_PASSWORD"],
     authentication: 'plain',
     enable_starttls_auto: true,
     open_timeout: 1000,  # Adjust the timeout values as needed
