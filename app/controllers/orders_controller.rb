@@ -85,30 +85,17 @@ class OrdersController < ApplicationController
   #   }
   # end
 
-    # def order_params
-    #   params.require(:order).permit(:total_price, :status)
-    # end
     def order_params
       permitted_params = params.require(:order).permit(:total_price, :status)
-      # Convert total_price to float
       {
         total_price: permitted_params[:total_price].to_f,
         status: permitted_params[:status]
       }
     end
-    
-  # def order_items_params
-  #   params.require(:order_items).map do |item|
-  #     item.permit(:menu_id, :quantity, :price)
-  #   end
-  # end
 
   def order_items_params
     params.require(:order_items).map do |item|
-      # Use permit to whitelist the fields
       permitted_item = item.permit(:menu_id, :quantity, :price)
-      
-      # Convert the parameters to appropriate types
       {
         menu_id: permitted_item[:menu_id].to_i,
         quantity: permitted_item[:quantity].to_i,

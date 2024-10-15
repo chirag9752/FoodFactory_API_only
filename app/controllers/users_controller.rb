@@ -37,7 +37,7 @@ class UsersController < ApplicationController
     else
       render json: { error: 'User ID not provided' }, status: :bad_request
     end
-  rescue ActiveRecord::RecordNotFound  #f the user ID is provided but doesn't exist in the database
+  rescue ActiveRecord::RecordNotFound
     render json: { error: 'User not found' }, status: :not_found
   end
 
