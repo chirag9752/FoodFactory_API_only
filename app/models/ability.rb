@@ -22,8 +22,7 @@ class Ability
       can :read, OrderItem
       can :manage, User
     else
-      # Handle cases where the user role is not recognized
-      can :read, :all # or restrict access as needed
+      can :read, :all 
     end
   end
 end
