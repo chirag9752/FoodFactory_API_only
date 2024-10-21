@@ -1,5 +1,5 @@
 class Users::SessionsController < Devise::SessionsController
-  
+
   include RackSessionsFix
   respond_to :json
 
@@ -10,13 +10,13 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find_by(email: email)
     if user && user.valid_password?(password)
       sign_in(user)
-      token = JwtTokenService.encode(user_id: user.id)
+      # token = JwtTokenService.encode(user_id: user.id)
       UserMailerJob.perform_later(user)
       render json: {
       status: {
       code: 200,
       message: 'Logged in successfully.',
-      data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes].merge(jwt: token) }
+      data: { user: UserSerializer.new(user).serializable_hash[:data][:attributes]}
       }
     }, status: :ok
     else
