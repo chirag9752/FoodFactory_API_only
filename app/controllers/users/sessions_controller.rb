@@ -63,39 +63,138 @@ class Users::SessionsController < Devise::SessionsController
         message: "Couldn't find an active session."
       }, status: :unauthorized
     end
-
   end
-  
-  
-
-
-
-
-
-  # def create
-  #   # If Authorization header is present, check if the user is already logged in
-  #   if response.headers['Authorization'].present?
-  #   current_token = request.headers['Authorization'].split(' ').last
-  #   jwt_payload = JWT.decode(current_token, Rails.application.credentials.devise_jwt_secret_key!).first
-  #   current_user_id = jwt_payload['sub']
-  
-  #   if current_user_id == current_user.id
-  #     render json: {
-  #   status: {
-  #     code: 200, message: "You are already logged in.",
-  #     data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-  #   }
-  #     }, status: :ok
-  #   else
-  #     # Proceed with the login for another user if the token doesn't match
-  #     super
-  #   end
-  #   else
-  #   # If no Authorization token is present, proceed with login
-  #   super
-  #   end
-  # end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

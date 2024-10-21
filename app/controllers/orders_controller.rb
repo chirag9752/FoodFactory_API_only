@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   
   before_action :authenticate_user!
   before_action :set_order, only: [:show, :destroy]
-  before_action :set_user, only: [:destroy , :index]
+  before_action :set_user, only: [:destroy , :index, :create]
   before_action :set_hotel, only: [:index, :create]
   load_and_authorize_resource
 
@@ -25,7 +25,6 @@ class OrdersController < ApplicationController
     result = create_order_service.call
     if result[:status] == :created
       render json: { checkout_url: result[:session].url }, status: :created
-      # render json: { order: objectForOrder(result) }, status: :created
     else
       render json: { errors: result[:errors] }, status: :unprocessable_entity
     end
@@ -70,39 +69,36 @@ class OrdersController < ApplicationController
   end
   
   def create_order_service
-    CreateOrderService.new(current_user,
+    result = order_items_params
+    CreateOrderService.new(@user,
                           @hotel,
                           order_params.to_h.deep_symbolize_keys,
-                          order_items_params.map(&:to_h).map(&:deep_symbolize_keys))
+                          result[:order_items].map(&:to_h).map(&:deep_symbolize_keys))
   end
 
-  # def objectForOrder(result)
-  #   {
-  #     order_id: result[:order].id,
-  #     status: result[:order].status,
-  #     total_price: result[:order].total_price,
-  #     order_items: result[:order_items]
-  #   }
-  # end
-
-    def order_params
-      permitted_params = params.require(:order).permit(:total_price, :status)
-      {
-        total_price: permitted_params[:total_price].to_f,
-        status: permitted_params[:status]
-      }
-    end
+  def order_params
+    result = order_items_params
+    {
+      total_price: result[:total_price],
+      status: "done"
+    }
+  end
 
   def order_items_params
-    params.require(:order_items).map do |item|
+    sum = 0
+    order_items = params.require(:order_items).map do |item|
       permitted_item = item.permit(:menu_id, :quantity, :price)
+      menu_id = permitted_item[:menu_id].to_i
+      menu = Menu.find(menu_id)
+      price =  menu.price.to_f
+      quantity = permitted_item[:quantity].to_i
+      sum = price * quantity
       {
-        menu_id: permitted_item[:menu_id].to_i,
-        quantity: permitted_item[:quantity].to_i,
-        price: permitted_item[:price].to_f
+        menu_id: menu_id,
+        quantity: quantity.to_i,
+        price: price
       }
     end
+    {order_items: order_items, total_price: sum }
   end
-  
-	
-end        
+end

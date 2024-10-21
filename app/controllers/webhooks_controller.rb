@@ -8,8 +8,7 @@ class WebhooksController < ApplicationController
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
 
     endpoint_secret = ENV["END_POINT_SECRET"]
-
-    byebug
+    
     begin
       event = Stripe::Webhook.construct_event(payload, sig_header, endpoint_secret)
     rescue JSON::ParserError => e
@@ -18,9 +17,8 @@ class WebhooksController < ApplicationController
       render json: { message: e.message }, status: 400 and return
     end
     
-    byebug
     if event['type'] == 'checkout.session.completed'
-      byebug
+
       session = event['data']['object']
       
       user_id = session.metadata.user_id
