@@ -114,7 +114,7 @@ RSpec.describe 'Users API', type: :request do
   describe 'POST #create' do
     context 'with valid parameters' do
       it 'creates a new order and order items' do
-        expect(CreateOrderService).to receive(:new).with(
+        expect(CreateCheckoutService).to receive(:new).with(
                                                           user, 
                                                           hotel, 
                                                           order_params.deep_symbolize_keys, 

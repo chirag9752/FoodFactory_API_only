@@ -22,7 +22,7 @@ class OrdersController < ApplicationController
   end
 
   def create
-    result = create_order_service.call
+    result = create_checkout_service.call
     if result[:status] == :created
       render json: { checkout_url: result[:session].url }, status: :created
     else
@@ -68,9 +68,9 @@ class OrdersController < ApplicationController
     end
   end
   
-  def create_order_service
+  def create_checkout_service
     result = order_items_params
-    CreateOrderService.new(@user,
+    CreateCheckoutService.new(@user,
                           @hotel,
                           order_params.to_h.deep_symbolize_keys,
                           result[:order_items].map(&:to_h).map(&:deep_symbolize_keys))

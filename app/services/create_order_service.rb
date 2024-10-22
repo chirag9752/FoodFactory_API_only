@@ -1,42 +1,57 @@
 class CreateOrderService
-  def initialize(user, hotel, order_params, order_items)
-    @user = user
-    @hotel = hotel
-    @order_params = order_params
-    @order_items = order_items
+  
+  def initialize(session)
+    @session = session
   end
 
   def call
-    line_items = @order_items.map do |item|
-      menu_item = Menu.find(item[:menu_id])
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: menu_item.menu_name
-          },
-          unit_amount: (menu_item.price * 100).to_i
-        },
-        quantity: item[:quantity]
-      }
+    begin
+      user_id = @session.metadata.user_id
+      hotel_id = @session.metadata.hotel_id
+      order_params = JSON.parse(@session.metadata.order_params)
+      order_items = JSON.parse(@session.metadata.order_items)
+
+      user = User.find(user_id)
+      hotel = Hotel.find(hotel_id)
+      
+      ActiveRecord::Base.transaction do
+        order = user.orders.new(order_params.merge(hotel_id: hotel.id, status: 'done'))
+        if order.save
+          create_order_items(order, order_items)
+          return { success: true, order: order }
+        else
+          log_error("Order creation failed", order.errors.full_messages)
+          raise ActiveRecord::Rollback, "Order creation failed"
+        end
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      log_error("Record not found", e.message)
+      return { success: false, errors: "Record not found: #{e.message}" }
+    rescue JSON::ParserError => e
+      log_error("JSON parsing failed", e.message)
+      return { success: false, errors: "Invalid json #{e.message}" }
+    rescue => e
+      log_error("unexpected error is coming", e.message)
+      return { success: false, errors: "An unexpected error is coming #{e.message}" }
     end
+  end
 
-    session = Stripe::Checkout::Session.create(
-      payment_method_types: ['card'],
-      line_items: line_items,
-      mode: 'payment',
-      metadata: {
-          user_id: @user.id,
-          hotel_id: @hotel.id,
-          order_params: @order_params.to_json,
-          order_items: @order_items.to_json
-        },
-      success_url: "http://127.0.0.1:3000",
-      cancel_url: "http://127.0.0.1:3000"
-    )
+  private
 
-    { session: session, status: :created}
-  rescue StandardError => e
-    { errors: e.message, status: :unprocessable_entity }
+  def create_order_items(order , order_items)
+    order_items.each do |item|
+      order.order_items.create!(
+        menu_id: item['menu_id'],
+        quantity: item['quantity'],
+        price: item['price']
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      log_error("OrderItem creation failed", e.message)
+      raise ActiveRecord::Rollback, "Order item creation failed: #{e.message}"
+    end
+  end
+
+  def log_error(message, details)
+    Rails.logger.error("#{message}: #{details}")
   end
 end
