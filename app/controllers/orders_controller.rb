@@ -7,13 +7,9 @@ class OrdersController < ApplicationController
   load_and_authorize_resource
 
   def index
-    if @user.role == "admin"
-      @orders = Order.all
-    elsif @user.role == "hotel_owner"
-      @orders = @hotel.orders
-    else
-      @orders = @user.orders
-    end
+    user = @user
+    hotel = @hotel
+    @orders = checkroles(user, hotel)
     render json: @orders, status: :ok
   end
 
@@ -40,6 +36,17 @@ class OrdersController < ApplicationController
   end
 
   private
+
+  def checkroles(user, hotel)
+    if user.role == "admin"
+      orders = Order.all
+    elsif user.role == "hotel_owner"
+      orders = hotel.orders
+    else
+      orders = user.orders
+    end
+    orders
+  end
 
   def set_hotel
     if params[:hotel_id].present?
